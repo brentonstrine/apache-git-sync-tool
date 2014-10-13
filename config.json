@@ -1,0 +1,48 @@
+{
+	"supportEmail": "brenton.a.strine@jpl.nasa.gov",
+	"supportEmailFrom": "github-deployment-tool@ott.jpl.nasa.gov.com",
+	"logs": false,
+	"retryOnErrorCount": 2,
+	
+	"projects": {
+		
+		"ott": {
+			"remote": "git@github.jpl.nasa.gov:EPS/ott.git",
+			"supportEmail": "brenton.a.strine@jpl.nasa.govm",
+			"branches": {
+				"master": {
+					"local": "/websites/ott/private/deploy"
+				},
+				"old": {
+					"local": "/home/ott/www/deploy/l17/",
+					"autosync": false,
+					"commandOnFinish": "echo good",
+					"urlOnFinish": "http://google.com",
+					"syncSubmodules": false
+				}
+			}
+		},
+
+		"~(.+)-js": {
+
+			"initial": [
+				"unitest-js",
+				"prototype-js"
+			],
+
+			"remote": "git@github.jpl.nasa.gov:EPS/{$project.0}.git",
+			
+			"branches": {
+				"~.+": {
+					"local": "/websites/ott/www/l37/{$project.1}/{$branch.0}"
+				},
+				"*": {
+					"local": "/home/ott/www/l40/{$project.1}/.redmine",
+					"bare": true,
+					"deep": true
+				}
+			}
+		}
+
+	}
+}

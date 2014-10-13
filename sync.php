@@ -148,7 +148,7 @@
 	//_output( 'Info - PHP max execution time: '.ini_get('max_execution_time').'sec<br/>' );
 	// Check user name and access to github
 	_executeCommandReal( 'Running the script as user', 'whoami' );
-	if ( _executeCommandReal( 'Testing ssh access to github', 'ssh -T git@github.com' ) == 255 ) {
+	if ( _executeCommandReal( 'Testing ssh access to github', 'ssh -T git@github.jpl.nasa.gov' ) == 255 ) {
 		// Host key verification failed.
 		_emailSupport( $config->supportEmail );
 		exit( 1 );
@@ -160,9 +160,9 @@
 	$projectOg = $project;
 	$branchOg = $branch;
 
-	$projects = [ $projectOg ];
+	$projects = array( $projectOg );
 	if ( $projectOg === '*' ) {
-		$projects = [];
+		$projects = array();
 		foreach ( $config->projects as $name => $value ) {
 			if ( $name[ 0 ] === '~' ) {
 				$projects = array_merge( $projects, $value->initial );
@@ -174,7 +174,7 @@
 	}
 	else if ( $projectOg[ 0 ] === '~' ) {
 		$pattern = '/^' . substr( $projectOg, 1 ) . '$/';
-		$projects = [];
+		$projects = array();
 		foreach ( $config->projects as $name => $value ) {
 			if ( $name[ 0 ] === '~' ) {
 				foreach ( $value->initial as $name ) {
@@ -209,10 +209,10 @@
 
 			_output( '<br/><br/>####<br/>#### Processing project: <b>' . $projectName . '</b><br/>####<br/>' );
 
-			$branches = [ $branchOg ];
+			$branches = array( $branchOg );
 			// loop all branches
 			if ( $branchOg === '*' || $branchOg[ 0 ] === '~' ) {
-				$branches = [];
+				$branches = array();
 				_executeCommandReal( 'Listing remote branches.', 'git ls-remote --heads ' . $projectConfig->remote, 0, null, null, function ( $command, $returnCode, $result ) use ( &$branches ) {
 					if ( $returnCode ) {
 						return;
@@ -243,7 +243,7 @@
 			}
 
 
-			$branchesDone = [];
+			$branchesDone = array();
 			foreach ( $branches as $branch ) {
 
 				foreach ( $projectConfig->branches as $branchName => $branchConfigOg ) {
@@ -449,9 +449,27 @@
 	 *  Writes end html tags and logs to file if enabled in configuration.
 	 */
 	function _atExit () {
+		recurse_copy("/websites/ott/private/deploy/www","/websites/ott/www");
+		_output( '<br/><span style="color: #6BE234;">Successfully deployed!</span>');
 		_output( '<br/><br/>##########' );
 		_output( '</div></body></html>', true );
 		_saveLogs();
+	}
+
+	function recurse_copy($src,$dst) { 
+		$dir = opendir($src); 
+		@mkdir($dst); 
+		while(false !== ( $file = readdir($dir)) ) { 
+			if (( $file != '.' ) && ( $file != '..' )) { 
+				if ( is_dir($src . '/' . $file) ) { 
+					recurse_copy($src . '/' . $file,$dst . '/' . $file); 
+				} 
+				else { 
+					copy($src . '/' . $file,$dst . '/' . $file); 
+				} 
+			} 
+		} 
+		closedir($dir); 
 	}
 
 	function _getLogsDir () {
@@ -505,7 +523,7 @@
 		// Execute command. Append 2>&1 to show errors.
 		if ( $testMode ) {
 			$returnCode = 0;
-			$result = [];
+			$result = array();
 		}
 		else {
 			exec( $command . ' 2>&1', $result, $returnCode );
@@ -595,7 +613,7 @@
 
 	function MatchName ( $nameA, $nameB, &$matches, $config = null ) {
 
-		$matches = [ $nameA ];
+		$matches = array( $nameA );
 
 		if ( $nameA === '*' || $nameB === '*' || $nameA === $nameB ) {
 			return true;
